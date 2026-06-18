@@ -67,10 +67,10 @@ class _SplashPageState extends State<SplashPage> {
                   child: Column(
                     children: [
                       const Spacer(),
-                      const AppLogo(size: 92, light: true),
-                      const SizedBox(height: 26),
+                      const AppLogo(size: 250, light: true),
+                      const SizedBox(height: 5),
                       const Text(
-                        'Dompet Kampus',
+                        ' Coach E-money',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
                           fontSize: 30,
@@ -79,9 +79,9 @@ class _SplashPageState extends State<SplashPage> {
                           letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       const Text(
-                        'GLOBAL',
+                        'Mulai Transaksimu dengan',
                         style: TextStyle(
                           fontFamily: 'PlusJakartaSans',
                           fontSize: 18,
@@ -90,7 +90,7 @@ class _SplashPageState extends State<SplashPage> {
                           letterSpacing: 3,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 5),
                       const Text(
                         'Bayar, transfer, dan kelola uang kuliah\ndalam satu aplikasi yang aman.',
                         textAlign: TextAlign.center,

@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const AppLogo(size: 50),
+                      const AppLogo(size: 95),
                       const SizedBox(height: 22),
                       const Text('Masuk',
                           style: TextStyle(
