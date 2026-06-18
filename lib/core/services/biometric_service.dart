@@ -68,7 +68,8 @@ class BiometricService {
         ),
       );
       return didAuthenticate;
-    } on PlatformException catch (_) {
+    } on PlatformException catch (e) {
+      print('[BiometricService] PlatformException: ${e.code} - ${e.message}');
       return false;
     }
   }

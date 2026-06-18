@@ -7,6 +7,7 @@ import '../../../domain/usecases/auth/logout_usecase.dart';
 import '../../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../core/error/failures.dart';
+import '../../../injection/injection_container.dart';
 
 // Events
 abstract class AuthEvent extends Equatable {
@@ -87,6 +88,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthUnauthenticated());
       return;
     }
+    // Set API token to client
+    setApiToken(token);
     final user = await _authRepo.getSavedUser();
     if (user == null) {
       emit(AuthUnauthenticated());
