@@ -8,6 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'injection/injection_container.dart' as di;
 import 'presentation/blocs/auth/auth_bloc.dart';
+import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,11 +44,18 @@ class DompetKampusApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => di.sl<AuthBloc>(),
-      child: MaterialApp.router(
-        title: 'Dompet Kampus Global',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        routerConfig: AppRouter.router,
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthAuthenticated) {
+            NotificationService.initialize(context);
+          }
+        },
+        child: MaterialApp.router(
+          title: 'Dompet Kampus Global',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          routerConfig: AppRouter.router,
+        ),
       ),
     );
   }
