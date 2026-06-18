@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/usecases/auth/update_profile_usecase.dart';
 import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -34,6 +35,13 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
     // Detect if logged in via Google Provider
     final providers = FirebaseAuth.instance.currentUser?.providerData ?? [];
     _isGoogleUser = providers.any((info) => info.providerId == 'google.com');
+
+    // Fetch latest user data in background to refresh local cache (in case the cached user JSON is older and lacks created_at)
+    sl<AuthRepository>().getMe().then((updatedUser) {
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthUserUpdated(updatedUser));
+      }
+    }).catchError((_) {});
   }
 
   @override

@@ -31,6 +31,20 @@ class AppAvatar extends StatelessWidget {
         .map((s) => s.isNotEmpty ? s[0].toUpperCase() : '')
         .join();
 
+    Widget buildInitials() {
+      return Center(
+        child: Text(
+          initials,
+          style: TextStyle(
+            fontFamily: 'PlusJakartaSans',
+            fontSize: size * 0.36,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: size,
       height: size,
@@ -40,18 +54,12 @@ class AppAvatar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: imageUrl != null
-          ? Image.network(imageUrl!, fit: BoxFit.cover)
-          : Center(
-              child: Text(
-                initials,
-                style: TextStyle(
-                  fontFamily: 'PlusJakartaSans',
-                  fontSize: size * 0.36,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          ? Image.network(
+              imageUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => buildInitials(),
+            )
+          : buildInitials(),
     );
   }
 }
