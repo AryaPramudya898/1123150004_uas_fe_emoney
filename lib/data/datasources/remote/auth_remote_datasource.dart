@@ -10,6 +10,7 @@ abstract class AuthRemoteDatasource {
   Future<void> updateFcmToken(String fcmToken);
   Future<void> sendChangeEmailOtp(String newEmail);
   Future<UserModel> updateEmail(String newEmail, String code);
+  Future<UserModel> updateProfile(String name);
   void clearAuthToken();
 }
 
