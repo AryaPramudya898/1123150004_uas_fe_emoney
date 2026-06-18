@@ -12,6 +12,7 @@ import '../../widgets/app_avatar.dart';
 import '../../widgets/app_logo.dart';
 import '../../widgets/feature_icon.dart';
 import '../../widgets/transaction_row.dart';
+import '../../../core/services/notification_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     context.read<AccountBloc>().add(AccountLoadRequested());
     context.read<AuthBloc>().add(AuthCheckRequested());
+    NotificationService.initialize(context);
   }
 
   @override
