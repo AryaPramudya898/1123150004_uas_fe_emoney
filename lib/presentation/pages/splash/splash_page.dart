@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/services/biometric_service.dart';
+import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_logo.dart';
@@ -14,10 +16,37 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  bool _isLocked = false;
+
   @override
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(AuthCheckRequested());
+  }
+
+  Future<void> _checkBiometricOnLaunch(user) async {
+    final service = sl<BiometricService>();
+    final isSupported = await service.isBiometricAvailable();
+    final isEnabled = await service.isBiometricEnabled();
+
+    if (isSupported && isEnabled) {
+      setState(() {
+        _isLocked = true;
+      });
+      _unlockWithBiometric();
+    } else {
+      if (mounted) {
+        context.go('/home');
+      }
+    }
+  }
+
+  Future<void> _unlockWithBiometric() async {
+    final service = sl<BiometricService>();
+    final success = await service.authenticate();
+    if (success && mounted) {
+      context.go('/home');
+    }
   }
 
   @override
@@ -25,7 +54,7 @@ class _SplashPageState extends State<SplashPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.go('/home');
+          _checkBiometricOnLaunch(state.user);
         } else if (state is AuthUnauthenticated) {
           // Stay on splash to show welcome
         }
@@ -103,19 +132,38 @@ class _SplashPageState extends State<SplashPage> {
                       ),
                       const Spacer(),
                       Column(
-                        children: [
-                          AppButton(
-                            label: 'Buat Akun Baru',
-                            variant: AppButtonVariant.white,
-                            onPressed: () => context.push('/register'),
-                          ),
-                          const SizedBox(height: 11),
-                          AppButton(
-                            label: 'Masuk ke Akun',
-                            variant: AppButtonVariant.outlineWhite,
-                            onPressed: () => context.push('/login'),
-                          ),
-                        ],
+                        children: _isLocked
+                            ? [
+                                AppButton(
+                                  label: 'Buka Kunci Aplikasi',
+                                  variant: AppButtonVariant.white,
+                                  onPressed: _unlockWithBiometric,
+                                ),
+                                const SizedBox(height: 11),
+                                AppButton(
+                                  label: 'Keluar dari Akun',
+                                  variant: AppButtonVariant.outlineWhite,
+                                  onPressed: () {
+                                    context.read<AuthBloc>().add(AuthLogoutRequested());
+                                    setState(() {
+                                      _isLocked = false;
+                                    });
+                                  },
+                                ),
+                              ]
+                            : [
+                                AppButton(
+                                  label: 'Buat Akun Baru',
+                                  variant: AppButtonVariant.white,
+                                  onPressed: () => context.push('/register'),
+                                ),
+                                const SizedBox(height: 11),
+                                AppButton(
+                                  label: 'Masuk ke Akun',
+                                  variant: AppButtonVariant.outlineWhite,
+                                  onPressed: () => context.push('/login'),
+                                ),
+                              ],
                       ),
                       const SizedBox(height: 30),
                     ],
