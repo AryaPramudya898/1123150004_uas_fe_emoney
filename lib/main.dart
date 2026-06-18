@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,9 @@ void main() async {
 
   // Initialize Firebase — pastikan google-services.json/GoogleService-Info.plist sudah ada
   await Firebase.initializeApp();
+
+  // Register FCM background message handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Initialize dependency injection
   await di.init();
@@ -47,7 +51,8 @@ class DompetKampusApp extends StatelessWidget {
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            NotificationService.initialize(context);
+            final authBloc = context.read<AuthBloc>();
+            NotificationService.registerToken(authBloc);
           }
         },
         child: MaterialApp.router(

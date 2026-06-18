@@ -28,7 +28,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     context.read<AccountBloc>().add(AccountLoadRequested());
     context.read<AuthBloc>().add(AuthCheckRequested());
-    NotificationService.initialize(context);
+    final authBloc = context.read<AuthBloc>();
+    NotificationService.registerToken(authBloc);
+    NotificationService.setupForegroundListener();
   }
 
   @override
