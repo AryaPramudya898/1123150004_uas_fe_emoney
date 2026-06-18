@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/services/biometric_service.dart';
+import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_field.dart';
@@ -23,6 +25,48 @@ class _LoginPageState extends State<LoginPage> {
   String _pw = '';
   bool _showPw = false;
   bool _gLoading = false;
+
+  bool _isBiometricSupported = false;
+  bool _isBiometricEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometricSupport();
+  }
+
+  Future<void> _checkBiometricSupport() async {
+    final service = sl<BiometricService>();
+    final isAvailable = await service.isBiometricAvailable();
+    final isEnabled = await service.isBiometricEnabled();
+    if (mounted) {
+      setState(() {
+        _isBiometricSupported = isAvailable;
+        _isBiometricEnabled = isEnabled;
+      });
+    }
+  }
+
+  Future<void> _loginWithBiometric() async {
+    final service = sl<BiometricService>();
+    final authenticated = await service.authenticate();
+    if (authenticated) {
+      final creds = await service.getSavedCredentials();
+      if (creds != null) {
+        setState(() {
+          _email = creds['email']!;
+          _pw = creds['password']!;
+        });
+        _loginWithEmail();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Kredensial biometrik tidak ditemukan. Silakan login manual terlebih dahulu.')),
+          );
+        }
+      }
+    }
+  }
 
   bool get _valid => _email.contains('@') && _pw.length >= 4;
 
@@ -81,6 +125,8 @@ class _LoginPageState extends State<LoginPage> {
       );
       final idToken = await userCredential.user?.getIdToken();
       if (idToken != null && mounted) {
+        // Simpan email & password secara aman untuk login biometrik nantinya
+        await sl<BiometricService>().saveCredentials(_email, _pw);
         context.read<AuthBloc>().add(AuthLoginWithFirebase(idToken));
       }
     } on FirebaseAuthException catch (e) {
@@ -241,11 +287,40 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 18),
                       BlocBuilder<AuthBloc, AuthState>(
-                        builder: (context, state) => AppButton(
-                          label: 'Masuk',
-                          onPressed: _valid ? _loginWithEmail : null,
-                          isLoading: state is AuthLoading,
-                        ),
+                        builder: (context, state) {
+                          final isLoading = state is AuthLoading;
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: AppButton(
+                                  label: 'Masuk',
+                                  onPressed: _valid ? _loginWithEmail : null,
+                                  isLoading: isLoading,
+                                ),
+                              ),
+                              if (_isBiometricSupported && _isBiometricEnabled) ...[
+                                const SizedBox(width: 12),
+                                Container(
+                                  height: 54,
+                                  width: 54,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primarySurface,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.primaryBorder, width: 1.5),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.fingerprint_rounded,
+                                      color: AppColors.primary,
+                                      size: 30,
+                                    ),
+                                    onPressed: isLoading ? null : _loginWithBiometric,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       Row(

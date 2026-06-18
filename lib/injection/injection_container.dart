@@ -24,6 +24,7 @@ import '../domain/usecases/auth/verify_firebase_token_usecase.dart';
 import '../domain/usecases/payment/payment_usecases.dart';
 import '../presentation/blocs/account/account_bloc.dart';
 import '../presentation/blocs/auth/auth_bloc.dart';
+import '../core/services/biometric_service.dart';
 import '../presentation/blocs/auth/otp_bloc.dart';
 import '../presentation/blocs/payment/payment_bloc.dart';
 
@@ -37,6 +38,7 @@ Future<void> init() async {
 
   // Core
   sl.registerLazySingleton<ApiClient>(() => ApiClient());
+  sl.registerLazySingleton<BiometricService>(() => BiometricService());
 
   // Local datasource
   sl.registerLazySingleton<SecureStorageDatasource>(

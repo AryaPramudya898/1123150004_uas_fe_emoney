@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/services/biometric_service.dart';
+import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_avatar.dart';
 import '../../widgets/app_badge.dart';
@@ -274,16 +276,79 @@ class _Row extends StatelessWidget {
 }
 
 class _Toggle extends StatefulWidget {
+  const _Toggle({super.key});
+
   @override
   State<_Toggle> createState() => _ToggleState();
 }
 
 class _ToggleState extends State<_Toggle> {
-  bool _on = true;
+  bool _on = false;
+  bool _isSupported = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometric();
+  }
+
+  Future<void> _checkBiometric() async {
+    final service = sl<BiometricService>();
+    final isSupported = await service.isBiometricAvailable();
+    final isEnabled = await service.isBiometricEnabled();
+    if (mounted) {
+      setState(() {
+        _isSupported = isSupported;
+        _on = isEnabled;
+      });
+    }
+  }
+
+  Future<void> _toggle() async {
+    final service = sl<BiometricService>();
+    if (!_isSupported) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Perangkat Anda tidak mendukung fitur biometrik.')),
+      );
+      return;
+    }
+
+    if (_on) {
+      // Turn off
+      await service.setBiometricEnabled(false);
+      setState(() => _on = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login biometrik dinonaktifkan.')),
+        );
+      }
+    } else {
+      // Turn on - authenticate first to verify identity
+      final success = await service.authenticate();
+      if (success) {
+        await service.setBiometricEnabled(true);
+        setState(() => _on = true);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login biometrik berhasil diaktifkan.')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Autentikasi gagal. Login biometrik tidak diaktifkan.')),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_isSupported) return const SizedBox.shrink();
+
     return GestureDetector(
-      onTap: () => setState(() => _on = !_on),
+      onTap: _toggle,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: 44,
