@@ -21,17 +21,15 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   late TextEditingController _nameController;
   bool _isLoading = false;
   bool _isGoogleUser = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Retrieve current auth state
-    final authState = context.read<AuthBloc>().state;
-    String initialName = '';
-    if (authState is AuthAuthenticated) {
-      initialName = authState.user.name;
-    }
-    _nameController = TextEditingController(text: initialName);
+    _nameController = TextEditingController();
+
+    // Trigger check for auth state to load user from local storage
+    context.read<AuthBloc>().add(AuthCheckRequested());
 
     // Detect if logged in via Google Provider
     final providers = FirebaseAuth.instance.currentUser?.providerData ?? [];
@@ -115,7 +113,13 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated && !_isInitialized) {
+          _nameController.text = state.user.name;
+          _isInitialized = true;
+        }
+      },
       builder: (context, state) {
         if (state is! AuthAuthenticated) {
           return const Scaffold(
