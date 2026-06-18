@@ -13,6 +13,8 @@ class ApiEndpoints {
   static const String me = '$_base/auth/me';
   static const String fcmToken = '$_base/auth/fcm-token';
   static const String updateProfile = '$_base/auth/profile';
+  static const String sendChangeEmailOtp = '$_base/auth/profile/send-email-otp';
+  static const String updateEmail = '$_base/auth/profile/update-email';
 
   // OTP
   static const String sendOtpFirebase = '$_base/otp/send-firebase';

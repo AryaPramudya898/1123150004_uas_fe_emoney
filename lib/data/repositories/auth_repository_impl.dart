@@ -93,6 +93,30 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> sendChangeEmailOtp(String newEmail) async {
+    try {
+      await _remote.sendChangeEmailOtp(newEmail);
+    } on ServerException catch (e) {
+      throw ServerFailure(e.message, errorCode: e.errorCode);
+    } on NetworkException catch (e) {
+      throw NetworkFailure(e.message);
+    }
+  }
+
+  @override
+  Future<UserEntity> updateEmail(String newEmail, String code) async {
+    try {
+      final result = await _remote.updateEmail(newEmail, code);
+      await _local.saveUserJson(result.toJsonString());
+      return result;
+    } on ServerException catch (e) {
+      throw ServerFailure(e.message, errorCode: e.errorCode);
+    } on NetworkException catch (e) {
+      throw NetworkFailure(e.message);
+    }
+  }
+
+  @override
   Future<void> logout() async {
     await _local.clearAll();
     _remote.clearAuthToken();

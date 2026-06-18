@@ -6,6 +6,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/usecases/auth/update_profile_usecase.dart';
+import '../../../domain/usecases/auth/send_change_email_otp_usecase.dart';
+import '../../../domain/usecases/auth/update_email_usecase.dart';
 import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_avatar.dart';
@@ -117,6 +119,270 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
         });
       }
     }
+  }
+
+  void _showChangeEmailDialog(BuildContext context, String currentEmail) {
+    final emailController = TextEditingController();
+    final otpController = TextEditingController();
+    int step = 1; // 1: Input Email, 2: Input OTP
+    bool dialogLoading = false;
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    step == 1 ? 'Ubah Alamat Email' : 'Verifikasi OTP',
+                    style: const TextStyle(
+                      fontFamily: 'PlusJakartaSans',
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: AppColors.slate400),
+                    onPressed: dialogLoading ? null : () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (dialogError != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.redSurface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.red.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: AppColors.red, size: 16),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              dialogError!,
+                              style: const TextStyle(
+                                fontFamily: 'PlusJakartaSans',
+                                color: AppColors.red,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                  if (step == 1) ...[
+                    const Text(
+                      'Masukkan alamat email baru Anda. Kami akan mengirimkan kode OTP untuk memverifikasinya.',
+                      style: TextStyle(
+                        fontFamily: 'PlusJakartaSans',
+                        fontSize: 13,
+                        height: 1.4,
+                        color: AppColors.slate600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(
+                        fontFamily: 'PlusJakartaSans',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: AppColors.ink,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'emailbaru@domain.com',
+                        prefixIcon: const Icon(Icons.mail_outline_rounded, color: AppColors.slate400),
+                        filled: true,
+                        fillColor: AppColors.bg,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Masukkan 6 digit kode verifikasi yang telah dikirim ke ${emailController.text.trim()}',
+                      style: const TextStyle(
+                        fontFamily: 'PlusJakartaSans',
+                        fontSize: 13,
+                        height: 1.4,
+                        color: AppColors.slate600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: otpController,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 6,
+                      style: const TextStyle(
+                        fontFamily: 'PlusJakartaSans',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        letterSpacing: 6,
+                        color: AppColors.ink,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: '000000',
+                        counterText: '',
+                        filled: true,
+                        fillColor: AppColors.bg,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              actions: [
+                GestureDetector(
+                  onTap: dialogLoading
+                      ? null
+                      : () async {
+                          final email = emailController.text.trim();
+                          if (step == 1) {
+                            if (email.isEmpty || !email.contains('@')) {
+                              setDialogState(() {
+                                dialogError = 'Masukkan email yang valid';
+                              });
+                              return;
+                            }
+                            if (email == currentEmail) {
+                              setDialogState(() {
+                                dialogError = 'Email baru tidak boleh sama dengan email sekarang';
+                              });
+                              return;
+                            }
+
+                            setDialogState(() {
+                              dialogLoading = true;
+                              dialogError = null;
+                            });
+
+                            try {
+                              await sl<SendChangeEmailOtpUsecase>().call(email);
+                              setDialogState(() {
+                                step = 2;
+                                dialogLoading = false;
+                              });
+                            } catch (e) {
+                              setDialogState(() {
+                                dialogError = e.toString().replaceAll('Exception: ', '');
+                                dialogLoading = false;
+                              });
+                            }
+                          } else {
+                            final code = otpController.text.trim();
+                            if (code.length != 6) {
+                              setDialogState(() {
+                                dialogError = 'OTP harus terdiri dari 6 digit';
+                              });
+                              return;
+                            }
+
+                            setDialogState(() {
+                              dialogLoading = true;
+                              dialogError = null;
+                            });
+
+                            try {
+                              final updatedUser = await sl<UpdateEmailUsecase>().call(email, code);
+                              if (context.mounted) {
+                                context.read<AuthBloc>().add(AuthUserUpdated(updatedUser));
+                                Navigator.pop(context); // Close dialog
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Icon(Icons.check_circle_rounded, color: Colors.white),
+                                        SizedBox(width: 8),
+                                        Text('Alamat email berhasil diperbarui'),
+                                      ],
+                                    ),
+                                    backgroundColor: AppColors.green,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              setDialogState(() {
+                                dialogError = e.toString().replaceAll('Exception: ', '');
+                                dialogLoading = false;
+                              });
+                            }
+                          }
+                        },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      gradient: dialogLoading ? null : AppColors.primaryGradient,
+                      color: dialogLoading ? AppColors.slate300 : null,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: dialogLoading ? null : AppColors.shadowPrimary,
+                    ),
+                    child: Center(
+                      child: dialogLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              step == 1 ? 'Kirim OTP' : 'Verifikasi & Simpan',
+                              style: const TextStyle(
+                                fontFamily: 'PlusJakartaSans',
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -324,14 +590,36 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Alamat Email',
-                                style: TextStyle(
-                                  fontFamily: 'PlusJakartaSans',
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.slate500,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Alamat Email',
+                                    style: TextStyle(
+                                      fontFamily: 'PlusJakartaSans',
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.slate500,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(0, 0),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    onPressed: () => _showChangeEmailDialog(context, user.email),
+                                    child: const Text(
+                                      'Ubah',
+                                      style: TextStyle(
+                                        fontFamily: 'PlusJakartaSans',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 8),
                               TextFormField(
@@ -359,40 +647,32 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: _isGoogleUser
-                                      ? AppColors.primarySurface.withValues(alpha: 0.5)
-                                      : AppColors.amberSurface,
+                                  color: AppColors.primarySurface.withValues(alpha: 0.5),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: _isGoogleUser
-                                        ? AppColors.primaryBorder.withValues(alpha: 0.5)
-                                        : AppColors.amber.withValues(alpha: 0.3),
+                                    color: AppColors.primaryBorder.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      _isGoogleUser
-                                          ? Icons.info_outline_rounded
-                                          : Icons.warning_amber_rounded,
+                                    const Icon(
+                                      Icons.info_outline_rounded,
                                       size: 18,
-                                      color: _isGoogleUser ? AppColors.primary : AppColors.amber,
+                                      color: AppColors.primary,
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         _isGoogleUser
-                                            ? 'Email ini terhubung dengan login Google Anda. Mengganti email di aplikasi tidak akan mengubah kredensial Google Sign-In Anda di Firebase.'
-                                            : 'Demi keamanan akun Anda, perubahan alamat email hanya dapat dilakukan dengan verifikasi OTP melalui Customer Service.',
-                                        style: TextStyle(
+                                            ? 'Mengganti email akan memperbarui email utama Anda di database dan Firebase. Anda tetap dapat masuk menggunakan Google, dan email baru ini juga dapat digunakan untuk login.'
+                                            : 'Perubahan alamat email memerlukan verifikasi OTP yang akan dikirimkan langsung ke alamat email baru Anda.',
+                                        style: const TextStyle(
                                           fontFamily: 'PlusJakartaSans',
                                           fontSize: 11,
                                           height: 1.4,
                                           fontWeight: FontWeight.w500,
-                                          color: _isGoogleUser
-                                              ? AppColors.primaryDark
-                                              : AppColors.amber,
+                                          color: AppColors.primaryDark,
                                         ),
                                       ),
                                     ),

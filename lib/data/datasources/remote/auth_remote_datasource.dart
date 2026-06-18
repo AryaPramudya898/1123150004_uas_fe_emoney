@@ -8,13 +8,34 @@ abstract class AuthRemoteDatasource {
   Future<void> verifyEmailOtp(String code);
   Future<UserModel> getMe();
   Future<void> updateFcmToken(String fcmToken);
-  Future<UserModel> updateProfile(String name);
+  Future<void> sendChangeEmailOtp(String newEmail);
+  Future<UserModel> updateEmail(String newEmail, String code);
   void clearAuthToken();
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final ApiClient _client;
   AuthRemoteDatasourceImpl(this._client);
+
+  @override
+  Future<void> sendChangeEmailOtp(String newEmail) async {
+    await _client.post(
+      ApiEndpoints.sendChangeEmailOtp,
+      data: {'email': newEmail},
+    );
+  }
+
+  @override
+  Future<UserModel> updateEmail(String newEmail, String code) async {
+    final response = await _client.post(
+      ApiEndpoints.updateEmail,
+      data: {
+        'email': newEmail,
+        'code': code,
+      },
+    );
+    return UserModel.fromJson(response['data'] as Map<String, dynamic>);
+  }
 
   @override
   Future<UserModel> updateProfile(String name) async {
