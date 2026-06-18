@@ -1,30 +1,28 @@
-// This is a basic Flutter widget test.
+// This is a basic Flutter widget test for the AppBadge widget.
 //
 // To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// utility in the flutter_test package.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:fe_emoney/main.dart';
+import 'package:coach_money/presentation/widgets/app_badge.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('AppBadge renders label correctly', (WidgetTester tester) async {
+    // Build AppBadge inside a MaterialApp.
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: AppBadge(
+            label: 'Test Badge',
+            tone: 'blue',
+          ),
+        ),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the AppBadge displays the text.
+    expect(find.text('Test Badge'), findsOneWidget);
   });
 }
+
