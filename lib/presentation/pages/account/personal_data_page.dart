@@ -31,8 +31,12 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
     super.initState();
     _nameController = TextEditingController();
 
-    // Trigger check for auth state to load user from local storage
-    context.read<AuthBloc>().add(AuthCheckRequested());
+    // Initialize controller text from current auth state if available
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      _nameController.text = authState.user.name;
+      _isInitialized = true;
+    }
 
     // Detect if logged in via Google Provider
     final providers = FirebaseAuth.instance.currentUser?.providerData ?? [];
@@ -623,6 +627,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                               ),
                               const SizedBox(height: 8),
                               TextFormField(
+                                key: ValueKey(user.email),
                                 initialValue: user.email,
                                 enabled: false,
                                 style: const TextStyle(

@@ -100,7 +100,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => TransferUsecase(sl()));
 
   // BLoCs
-  sl.registerFactory(() => AuthBloc(
+  sl.registerLazySingleton(() => AuthBloc(
         verifyToken: sl(),
         getMe: sl(),
         logout: sl(),
