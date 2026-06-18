@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -41,7 +42,12 @@ class AccountPage extends StatelessWidget {
                       20, MediaQuery.of(context).padding.top + 12, 20, 24),
                   child: Row(
                     children: [
-                      AppAvatar(name: user?.name ?? 'User', size: 60, bg: Colors.white.withValues(alpha: 0.25)),
+                      AppAvatar(
+                        name: user?.name ?? 'User',
+                        size: 60,
+                        bg: Colors.white.withValues(alpha: 0.25),
+                        imageUrl: FirebaseAuth.instance.currentUser?.photoURL,
+                      ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
