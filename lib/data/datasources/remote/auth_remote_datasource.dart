@@ -8,12 +8,22 @@ abstract class AuthRemoteDatasource {
   Future<void> verifyEmailOtp(String code);
   Future<UserModel> getMe();
   Future<void> updateFcmToken(String fcmToken);
+  Future<UserModel> updateProfile(String name);
   void clearAuthToken();
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final ApiClient _client;
   AuthRemoteDatasourceImpl(this._client);
+
+  @override
+  Future<UserModel> updateProfile(String name) async {
+    final response = await _client.put(
+      ApiEndpoints.updateProfile,
+      data: {'name': name},
+    );
+    return UserModel.fromJson(response['data'] as Map<String, dynamic>);
+  }
 
   @override
   Future<({UserModel user, String token})> verifyFirebaseToken(String firebaseToken) async {

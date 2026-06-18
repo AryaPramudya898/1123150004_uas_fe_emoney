@@ -9,6 +9,7 @@ class UserEntity extends Equatable {
   final bool emailVerified;
   final bool totpEnabled;
   final String? twoFaMethod;
+  final String? createdAt;
 
   const UserEntity({
     required this.id,
@@ -19,10 +20,11 @@ class UserEntity extends Equatable {
     required this.emailVerified,
     required this.totpEnabled,
     this.twoFaMethod,
+    this.createdAt,
   });
 
   String get firstName => name.split(' ').first;
 
   @override
-  List<Object?> get props => [id, firebaseUid, email, name, role, emailVerified, totpEnabled, twoFaMethod];
+  List<Object?> get props => [id, firebaseUid, email, name, role, emailVerified, totpEnabled, twoFaMethod, createdAt];
 }

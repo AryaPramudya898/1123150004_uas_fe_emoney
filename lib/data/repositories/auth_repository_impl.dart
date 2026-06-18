@@ -78,6 +78,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<UserEntity> updateProfile(String name) async {
+    try {
+      final result = await _remote.updateProfile(name);
+      await _local.saveUserJson(result.toJsonString());
+      return result;
+    } on ServerException catch (e) {
+      throw ServerFailure(e.message, errorCode: e.errorCode);
+    } on NetworkException catch (e) {
+      throw NetworkFailure(e.message);
+    }
+  }
+
+  @override
   Future<void> logout() async {
     await _local.clearAll();
     _remote.clearAuthToken();

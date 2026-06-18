@@ -11,6 +11,7 @@ class UserModel extends UserEntity {
     required super.emailVerified,
     required super.totpEnabled,
     super.twoFaMethod,
+    super.createdAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +24,7 @@ class UserModel extends UserEntity {
       emailVerified: json['email_verified'] as bool? ?? false,
       totpEnabled: json['totp_enabled'] as bool? ?? false,
       twoFaMethod: json['two_fa_method'] as String?,
+      createdAt: json['created_at'] as String?,
     );
   }
 
@@ -36,6 +38,7 @@ class UserModel extends UserEntity {
       'email_verified': emailVerified,
       'totp_enabled': totpEnabled,
       'two_fa_method': twoFaMethod,
+      'created_at': createdAt,
     };
   }
 

@@ -6,6 +6,7 @@ abstract class AuthRepository {
   Future<void> verifyEmailOtp(String code);
   Future<UserEntity> getMe();
   Future<void> updateFcmToken(String fcmToken);
+  Future<UserEntity> updateProfile(String name);
   Future<void> logout();
   Future<String?> getSavedToken();
   Future<UserEntity?> getSavedUser();

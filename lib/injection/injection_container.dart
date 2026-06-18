@@ -21,6 +21,7 @@ import '../domain/usecases/auth/register_with_otp_usecase.dart';
 import '../domain/usecases/auth/send_otp_usecase.dart';
 import '../domain/usecases/auth/verify_email_otp_usecase.dart';
 import '../domain/usecases/auth/verify_firebase_token_usecase.dart';
+import '../domain/usecases/auth/update_profile_usecase.dart';
 import '../domain/usecases/payment/payment_usecases.dart';
 import '../presentation/blocs/account/account_bloc.dart';
 import '../presentation/blocs/auth/auth_bloc.dart';
@@ -84,6 +85,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ConfirmOtpUsecase(sl()));
   sl.registerLazySingleton(() => RegisterTotpUsecase(sl()));
   sl.registerLazySingleton(() => VerifyTotpUsecase(sl()));
+  sl.registerLazySingleton(() => UpdateProfileUsecase(sl()));
 
   // Use Cases — Account
   sl.registerLazySingleton(() => GetAccountUsecase(sl()));

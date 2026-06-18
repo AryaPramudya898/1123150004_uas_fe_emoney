@@ -30,6 +30,13 @@ class AuthUpdateFcmToken extends AuthEvent {
   List<Object?> get props => [fcmToken];
 }
 
+class AuthUserUpdated extends AuthEvent {
+  final UserEntity user;
+  AuthUserUpdated(this.user);
+  @override
+  List<Object?> get props => [user];
+}
+
 // States
 abstract class AuthState extends Equatable {
   @override
@@ -79,6 +86,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginWithFirebase>(_onLoginWithFirebase);
     on<AuthLogoutRequested>(_onLogout);
     on<AuthUpdateFcmToken>(_onUpdateFcm);
+    on<AuthUserUpdated>(_onUserUpdated);
   }
 
   Future<void> _onCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
@@ -129,5 +137,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onUpdateFcm(AuthUpdateFcmToken event, Emitter<AuthState> emit) async {
     await _authRepo.updateFcmToken(event.fcmToken);
+  }
+
+  void _onUserUpdated(AuthUserUpdated event, Emitter<AuthState> emit) {
+    emit(AuthAuthenticated(event.user));
   }
 }

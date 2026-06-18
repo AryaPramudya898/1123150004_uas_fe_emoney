@@ -165,7 +165,7 @@ class AccountPage extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            _Row(icon: Icons.person_outline_rounded, tone: 'blue', title: 'Data pribadi', onTap: () {}),
+                            _Row(icon: Icons.person_outline_rounded, tone: 'blue', title: 'Data pribadi', onTap: () => context.push('/profile/edit')),
                             const Divider(height: 1, indent: 56, color: AppColors.line2),
                             _Row(icon: Icons.account_balance_outlined, tone: 'green', title: 'Rekening & kartu tersimpan', onTap: () {}),
                             const Divider(height: 1, indent: 56, color: AppColors.line2),
