@@ -15,7 +15,7 @@ class NotificationService {
     try {
       log('[FCM] Initializing notifications...');
 
-      // 1. Request notification permission (necessary for Android 13+)
+      // Request notification permission (necessary for Android 13+)
       NotificationSettings settings = await _messaging.requestPermission(
         alert: true,
         announcement: false,
@@ -29,7 +29,7 @@ class NotificationService {
       log('[FCM] Permission status: ${settings.authorizationStatus}');
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        // 2. Get FCM token
+        // Get FCM token
         String? token = await _messaging.getToken();
         if (token != null) {
           log('[FCM] Token obtained: $token');
@@ -47,7 +47,7 @@ class NotificationService {
         });
       }
 
-      // 4. Handle foreground notifications (show snackbar when app is open)
+      // Handle foreground notifications (show snackbar when app is open)
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         log('[FCM] Foreground message received: ${message.notification?.title}');
         if (context.mounted && message.notification != null) {
