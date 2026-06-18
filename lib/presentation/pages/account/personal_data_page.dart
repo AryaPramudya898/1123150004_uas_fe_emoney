@@ -203,6 +203,15 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                                   'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png',
                                   width: 20,
                                   height: 20,
+                                  errorBuilder: (context, error, stackTrace) => const Text(
+                                    'G',
+                                    style: TextStyle(
+                                      fontFamily: 'PlusJakartaSans',
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.primary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
                                 ),
                               ),
                           ],
