@@ -131,9 +131,9 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
+      builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (builderContext, setDialogState) {
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -153,7 +153,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded, color: AppColors.slate400),
-                    onPressed: dialogLoading ? null : () => Navigator.pop(context),
+                    onPressed: dialogLoading ? null : () => Navigator.pop(dialogContext),
                   ),
                 ],
               ),
@@ -323,7 +323,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                               final updatedUser = await sl<UpdateEmailUsecase>().call(email, code);
                               if (context.mounted) {
                                 context.read<AuthBloc>().add(AuthUserUpdated(updatedUser));
-                                Navigator.pop(context); // Close dialog
+                                Navigator.pop(dialogContext); // Close dialog
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Row(
@@ -347,7 +347,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                           }
                         },
                   child: Container(
-                    width: double.infinity,
+                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
                       gradient: dialogLoading ? null : AppColors.primaryGradient,
@@ -665,7 +665,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                                     Expanded(
                                       child: Text(
                                         _isGoogleUser
-                                            ? 'Mengganti email akan memperbarui email utama Anda di database dan Firebase. Anda tetap dapat masuk menggunakan Google, dan email baru ini juga dapat digunakan untuk login.'
+                                            ? 'Mengganti email akan memperbarui email utama Anda. Anda tetap dapat masuk menggunakan Google, dan email baru yang digunakan untuk login.'
                                             : 'Perubahan alamat email memerlukan verifikasi OTP yang akan dikirimkan langsung ke alamat email baru Anda.',
                                         style: const TextStyle(
                                           fontFamily: 'PlusJakartaSans',
