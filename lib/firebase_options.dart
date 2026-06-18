@@ -17,16 +17,16 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -49,20 +49,21 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCWAzGMTyg1uSspi1qfno71sj4iCfp7qGk',
-    appId: '1:948878883710:android:516b94bdc2276b68a0512f',
-    messagingSenderId: '948878883710',
-    projectId: 'fir-emoney-e9256',
-    storageBucket: 'fir-emoney-e9256.firebasestorage.app',
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDzBD8W5maHRSJUbL2zm7FucS2TtbTdmPI',
+    appId: '1:53095658878:web:cbc0b2121fec7c9b41ef2f',
+    messagingSenderId: '53095658878',
+    projectId: 'be-e-money',
+    authDomain: 'be-e-money.firebaseapp.com',
+    storageBucket: 'be-e-money.firebasestorage.app',
+    measurementId: 'G-J24T3HGDH9',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA46uBUvmVQKsSL7HIXZG58MD9jXQCFX7c',
-    appId: '1:948878883710:ios:5363ad2b9fbe06b2a0512f',
-    messagingSenderId: '948878883710',
-    projectId: 'fir-emoney-e9256',
-    storageBucket: 'fir-emoney-e9256.firebasestorage.app',
-    iosBundleId: 'com.kampus.dompetKampusGlobal',
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyB_-wLg46FnLnb5Myc_Hu_BED7CglUWOps',
+    appId: '1:53095658878:android:c09d35c0d80d997341ef2f',
+    messagingSenderId: '53095658878',
+    projectId: 'be-e-money',
+    storageBucket: 'be-e-money.firebasestorage.app',
   );
 }

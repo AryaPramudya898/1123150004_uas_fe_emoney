@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "53095658878",
+    "project_id": "be-e-money",
+    "storage_bucket": "be-e-money.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53095658878:android:68e0fba54e5cc8d941ef2f",
+        "android_client_info": {
+          "package_name": "coach.emoney.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53095658878-pn17uft894b9s07fir6ni2gqb4nk907u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_-wLg46FnLnb5Myc_Hu_BED7CglUWOps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53095658878-pn17uft894b9s07fir6ni2gqb4nk907u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53095658878:android:c09d35c0d80d997341ef2f",
+        "android_client_info": {
+          "package_name": "com.example.fe_emoney"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53095658878-pn17uft894b9s07fir6ni2gqb4nk907u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_-wLg46FnLnb5Myc_Hu_BED7CglUWOps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53095658878-pn17uft894b9s07fir6ni2gqb4nk907u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
