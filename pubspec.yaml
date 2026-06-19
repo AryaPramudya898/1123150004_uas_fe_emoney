@@ -49,6 +49,12 @@ dependencies:
   # Biometric
   local_auth: ^2.3.0
 
+  # Navigation
+  go_router: ^14.8.1
+
+  # Deep Links 
+  app_links: ^6.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
