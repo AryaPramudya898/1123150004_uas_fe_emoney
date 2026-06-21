@@ -122,7 +122,9 @@ class AccountPage extends StatelessWidget {
                               icon: Icons.verified_user_outlined,
                               tone: 'green',
                               title: 'Verifikasi 2 langkah (2FA)',
-                              subtitle: 'Aktif · Email OTP',
+                              subtitle: user?.totpEnabled == true
+                                  ? 'Aktif · Authenticator (TOTP)'
+                                  : 'Aktif · Email OTP',
                               onTap: () => context.go('/setup-2fa'),
                               right: const AppBadge(label: 'Aktif', tone: 'green'),
                             ),

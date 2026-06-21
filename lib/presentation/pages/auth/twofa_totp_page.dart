@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/usecases/auth/get_me_usecase.dart';
+import '../../../injection/injection_container.dart';
+import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/otp_bloc.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/code_input.dart';
@@ -57,6 +60,10 @@ class _TwoFATotpPageState extends State<TwoFATotpPage> {
         if (state is OtpTotpSetup) {
           setState(() => _step = 'scan');
         } else if (state is OtpTotpEnabled || state is OtpVerified) {
+          final authBloc = context.read<AuthBloc>();
+          sl<GetMeUsecase>().call().then((user) {
+            authBloc.add(AuthUserUpdated(user));
+          }).catchError((_) {});
           context.go('/home');
         } else if (state is OtpInvalid) {
           setState(() => _hasError = true);

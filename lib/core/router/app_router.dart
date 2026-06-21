@@ -30,6 +30,7 @@ import '../../presentation/pages/transfer/transfer_page.dart';
 import '../../presentation/widgets/app_tab_bar.dart';
 import '../../presentation/pages/payment/payment_deeplink_page.dart';
 import '../../core/services/deeplink_service.dart';
+import '../../presentation/pages/payment/payment_otp_page.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -174,6 +175,13 @@ class AppRouter {
             path: '/pay',
             builder: (_, state) => PaymentDeeplinkPage(data: state.extra),
           ),
+          GoRoute(
+            path: '/payment-otp',
+            builder: (_, state) {
+              final extra = (state.extra as Map<String, dynamic>?) ?? {};
+              return _withPayment(PaymentOtpPage(flowData: extra));
+            },
+          ),
         ],
       );
 
@@ -199,6 +207,15 @@ class AppRouter {
     return MultiBlocProvider(providers: [
       BlocProvider(create: (_) => sl<AccountBloc>()),
       BlocProvider(create: (_) => sl<PaymentBloc>()),
+    ], child: child);
+  }
+
+  /// Sama seperti _withPayment tapi juga include OtpBloc untuk payment OTP page.
+  static Widget _withPaymentOtp(Widget child) {
+    return MultiBlocProvider(providers: [
+      BlocProvider(create: (_) => sl<AccountBloc>()),
+      BlocProvider(create: (_) => sl<PaymentBloc>()),
+      BlocProvider(create: (_) => sl<OtpBloc>()),
     ], child: child);
   }
 }

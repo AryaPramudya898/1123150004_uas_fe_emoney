@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../blocs/payment/payment_bloc.dart';
 import '../../widgets/feature_icon.dart';
 import '../../widgets/pin_pad.dart';
+
 
 class PinPage extends StatefulWidget {
   final Map<String, dynamic> flowData;
@@ -22,37 +22,9 @@ class _PinPageState extends State<PinPage> {
   bool _hasError = false;
 
   void _onComplete(String pin) {
-    // In production, validate PIN with backend
-    // Here we simulate: any 6-digit PIN triggers the payment
-    setState(() => _busy = true);
-    _processPayment();
-  }
-
-  void _processPayment() {
-    final flow = widget.flowData;
-    final kind = flow['kind'] as String? ?? '';
-
-    if (kind == 'transfer') {
-      // Use OTP from 2FA — for demo we use a hardcoded type
-      context.read<PaymentBloc>().add(PaymentTransferRequested(
-        amount: (flow['amount'] as num).toDouble(),
-        description: flow['note'] as String? ?? 'Transfer',
-        otpCode: '000000', // In production: get from actual 2FA
-        otpType: AppConstants.otpTypeTotp,
-      ));
-    } else if (kind == 'topup') {
-      context.read<PaymentBloc>().add(PaymentTopupRequested(
-        (flow['amount'] as num).toDouble(),
-      ));
-    } else if (kind == 'payment' || kind == 'deeplink') {
-      // QRIS payment → also uses transfer endpoint
-      context.read<PaymentBloc>().add(PaymentTransferRequested(
-        amount: (flow['amount'] as num).toDouble(),
-        description: flow['description'] as String? ?? 'Pembayaran QRIS',
-        otpCode: '000000',
-        otpType: AppConstants.otpTypeTotp,
-      ));
-    }
+    // PIN validasi lokal — PIN apapun 6 digit diterima untuk sekarang.
+    // Setelah PIN benar → navigasi ke OTP verification page.
+    context.go('/payment-otp', extra: widget.flowData);
   }
 
   @override
