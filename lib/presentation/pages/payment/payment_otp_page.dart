@@ -75,6 +75,14 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
               backgroundColor: AppColors.red,
             ),
           );
+        } else if (state is PaymentInsufficientBalance) {
+          setState(() => _verifying = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Saldo Anda tidak mencukupi untuk melakukan transaksi ini.'),
+              backgroundColor: AppColors.red,
+            ),
+          );
         } else if (state is PaymentError) {
           setState(() => _verifying = false);
           ScaffoldMessenger.of(context).showSnackBar(
