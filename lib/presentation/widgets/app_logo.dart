@@ -31,7 +31,7 @@ class AppLogo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Dompet Kampus',
+              'Coach',
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontSize: size * 0.3,
@@ -42,7 +42,7 @@ class AppLogo extends StatelessWidget {
               ),
             ),
             Text(
-              'GLOBAL',
+              'E-MONEY',
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontSize: size * 0.205,
