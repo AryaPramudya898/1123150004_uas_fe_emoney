@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/services/biometric_service.dart';
+import '../../../injection/injection_container.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../blocs/payment/payment_bloc.dart';
 import '../../widgets/feature_icon.dart';
@@ -20,6 +22,32 @@ class _PinPageState extends State<PinPage> {
   String _pin = '';
   bool _busy = false;
   bool _hasError = false;
+  bool _isBioEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+  }
+
+  Future<void> _checkBiometrics() async {
+    final service = sl<BiometricService>();
+    final isAvailable = await service.isBiometricAvailable();
+    final isEnabled = await service.isBiometricEnabled();
+    if (mounted) {
+      setState(() {
+        _isBioEnabled = isAvailable && isEnabled;
+      });
+    }
+  }
+
+  Future<void> _authenticateBiometric() async {
+    final service = sl<BiometricService>();
+    final success = await service.authenticate();
+    if (success && mounted) {
+      _onComplete('');
+    }
+  }
 
   void _onComplete(String pin) {
     // PIN validasi lokal — PIN apapun 6 digit diterima untuk sekarang.
@@ -129,6 +157,7 @@ class _PinPageState extends State<PinPage> {
                             value: _pin,
                             onChanged: (v) => setState(() => _pin = v),
                             onComplete: _onComplete,
+                            onBioPressed: _isBioEnabled ? _authenticateBiometric : null,
                           ),
                         ),
                         const SizedBox(height: 18),

@@ -6,6 +6,7 @@ class PinPad extends StatelessWidget {
   final int length;
   final ValueChanged<String> onChanged;
   final ValueChanged<String>? onComplete;
+  final VoidCallback? onBioPressed;
 
   const PinPad({
     super.key,
@@ -13,6 +14,7 @@ class PinPad extends StatelessWidget {
     required this.onChanged,
     this.length = 6,
     this.onComplete,
+    this.onBioPressed,
   });
 
   void _press(String key) {
@@ -66,8 +68,11 @@ class PinPad extends StatelessWidget {
           childAspectRatio: 1.4,
           children: keys.map((k) {
             if (k == 'bio') {
+              if (onBioPressed == null) {
+                return const SizedBox();
+              }
               return _KeyButton(
-                onTap: () => onComplete?.call(value),
+                onTap: onBioPressed!,
                 child: const Icon(Icons.fingerprint_rounded, size: 28, color: AppColors.primary),
               );
             }
