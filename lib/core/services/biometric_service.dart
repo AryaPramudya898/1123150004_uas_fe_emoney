@@ -7,7 +7,7 @@ class BiometricService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
-  
+
   static const String _biometricEnabledKey = 'biometric_enabled';
   static const String _savedEmailKey = 'biometric_email';
   static const String _savedPasswordKey = 'biometric_password';
