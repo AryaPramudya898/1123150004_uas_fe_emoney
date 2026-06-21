@@ -26,6 +26,9 @@ void main() async {
   // Initialize dependency injection
   await di.init();
 
+  // Init deeplink service — tangkap URI cold-start sebelum runApp
+  await AppRouter.initDeeplink();
+
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

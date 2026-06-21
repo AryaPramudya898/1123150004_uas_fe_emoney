@@ -28,11 +28,15 @@ import '../../presentation/pages/transfer/transfer_amount_page.dart';
 import '../../presentation/pages/transfer/transfer_confirm_page.dart';
 import '../../presentation/pages/transfer/transfer_page.dart';
 import '../../presentation/widgets/app_tab_bar.dart';
+import '../../presentation/pages/payment/payment_deeplink_page.dart';
+import '../../core/services/deeplink_service.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  static GoRouter get router => GoRouter(
+  static late final DeeplinkService _deeplinkService;
+
+  static final GoRouter router = GoRouter(
         navigatorKey: _rootNavigatorKey,
         initialLocation: '/',
         routes: [
@@ -165,8 +169,19 @@ class AppRouter {
             },
           ),
           GoRoute(path: '/merchant', builder: (_, __) => _withPayment(const MerchantCheckoutPage())),
+          // Deeplink payment page
+          GoRoute(
+            path: '/pay',
+            builder: (_, state) => PaymentDeeplinkPage(data: state.extra),
+          ),
         ],
       );
+
+  /// Inisialisasi DeeplinkService — panggil sekali setelah GoRouter dibuat.
+  static Future<void> initDeeplink() async {
+    _deeplinkService = DeeplinkService(router);
+    await _deeplinkService.init();
+  }
 
   static Widget _withAuth(Widget child) {
     return child;

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/services/biometric_service.dart';
+import '../../../core/services/deeplink_service.dart';
 import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
@@ -36,8 +37,18 @@ class _SplashPageState extends State<SplashPage> {
       _unlockWithBiometric();
     } else {
       if (mounted) {
-        context.go('/home');
+        _navigateAfterAuth();
       }
+    }
+  }
+
+  /// Navigasi ke /pay jika ada pending deeplink, atau /home jika tidak.
+  void _navigateAfterAuth() {
+    final pending = DeeplinkService.consumePending();
+    if (pending != null) {
+      context.go('/pay', extra: pending);
+    } else {
+      context.go('/home');
     }
   }
 
@@ -45,7 +56,7 @@ class _SplashPageState extends State<SplashPage> {
     final service = sl<BiometricService>();
     final success = await service.authenticate();
     if (success && mounted) {
-      context.go('/home');
+      _navigateAfterAuth();
     }
   }
 
