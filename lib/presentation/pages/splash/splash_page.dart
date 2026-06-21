@@ -107,7 +107,7 @@ class _SplashPageState extends State<SplashPage> {
                   child: Column(
                     children: [
                       const Spacer(),
-                      const AppLogo(size: 400, light: true),
+                      const AppLogo(size: 250, light: true),
                       const SizedBox(height: 5),
                       const Text(
                         ' Coach E-money',
