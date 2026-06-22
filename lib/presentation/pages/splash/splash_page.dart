@@ -42,11 +42,15 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
-  /// Navigasi ke /pay jika ada pending deeplink, atau /home jika tidak.
+  /// Navigasi ke halaman deeplink yang sesuai jika ada pending deeplink, atau /home jika tidak.
   void _navigateAfterAuth() {
     final pending = DeeplinkService.consumePending();
     if (pending != null) {
-      context.go('/pay', extra: pending);
+      if (pending is DeeplinkConnectData) {
+        context.go('/connect-wallet', extra: pending);
+      } else {
+        context.go('/pay', extra: pending);
+      }
     } else {
       context.go('/home');
     }

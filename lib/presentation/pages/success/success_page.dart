@@ -68,15 +68,17 @@ class _SuccessPageState extends State<SuccessPage> {
                             color: AppColors.slate500,
                           )),
                     ],
-                    const SizedBox(height: 20),
-                    Text(CurrencyFormatter.format(widget.amount),
-                        style: const TextStyle(
-                          fontFamily: 'PlusJakartaSans',
-                          fontSize: 36,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.ink,
-                          letterSpacing: -0.6,
-                        )),
+                    if (widget.amount > 0) ...[
+                      const SizedBox(height: 20),
+                      Text(CurrencyFormatter.format(widget.amount),
+                          style: const TextStyle(
+                            fontFamily: 'PlusJakartaSans',
+                            fontSize: 36,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.ink,
+                            letterSpacing: -0.6,
+                          )),
+                    ],
                     if (widget.lines.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       Container(
@@ -134,13 +136,15 @@ class _SuccessPageState extends State<SuccessPage> {
                     label: 'Selesai',
                     onPressed: () => context.go('/home'),
                   ),
-                  const SizedBox(height: 10),
-                  AppButton(
-                    label: 'Bagikan bukti transaksi',
-                    variant: AppButtonVariant.soft,
-                    icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
-                    onPressed: () {},
-                  ),
+                  if (widget.amount > 0) ...[
+                    const SizedBox(height: 10),
+                    AppButton(
+                      label: 'Bagikan bukti transaksi',
+                      variant: AppButtonVariant.soft,
+                      icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
+                      onPressed: () {},
+                    ),
+                  ],
                 ],
               ),
             ),

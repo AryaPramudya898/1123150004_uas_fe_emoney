@@ -41,6 +41,24 @@ class DeeplinkCallbackService {
     });
   }
 
+  /// Kirim callback sukses setelah wallet berhasil dihubungkan.
+  static Future<void> notifyConnectSuccess({
+    required String callbackUrl,
+  }) async {
+    await _launch(callbackUrl, {
+      'status': 'success',
+    });
+  }
+
+  /// Kirim callback dibatalkan/ditolak saat menghubungkan wallet.
+  static Future<void> notifyConnectCancelled({
+    required String callbackUrl,
+  }) async {
+    await _launch(callbackUrl, {
+      'status': 'cancelled',
+    });
+  }
+
   /// Kirim callback dibatalkan saat pengguna menutup halaman sebelum bayar.
   static Future<void> notifyCancelled({
     required String callbackUrl,

@@ -10,6 +10,8 @@ import '../../widgets/feature_icon.dart';
 import '../../widgets/pin_pad.dart';
 
 
+import '../../../core/services/deeplink_callback_service.dart';
+
 class PinPage extends StatefulWidget {
   final Map<String, dynamic> flowData;
   const PinPage({super.key, required this.flowData});
@@ -50,8 +52,6 @@ class _PinPageState extends State<PinPage> {
   }
 
   void _onComplete(String pin) {
-    // PIN validasi lokal — PIN apapun 6 digit diterima untuk sekarang.
-    // Setelah PIN benar → navigasi ke OTP verification page.
     context.go('/payment-otp', extra: widget.flowData);
   }
 
