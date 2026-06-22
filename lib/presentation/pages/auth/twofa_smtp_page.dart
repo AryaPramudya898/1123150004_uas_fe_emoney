@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/services/deeplink_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/otp_bloc.dart';
 import '../../widgets/app_button.dart';
@@ -58,10 +59,10 @@ class _TwoFASmtpPageState extends State<TwoFASmtpPage> {
       listener: (context, state) {
         if (state is OtpVerified) {
           if (widget.mode == 'setup') {
-            context.go('/home');
+            DeeplinkService.navigateAfterAuth(context);
           } else {
             context.read<AuthBloc>().add(AuthCheckRequested());
-            context.go('/home');
+            DeeplinkService.navigateAfterAuth(context);
           }
         } else if (state is OtpInvalid) {
           setState(() { _hasError = true; });

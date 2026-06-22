@@ -179,6 +179,25 @@ class DeeplinkService {
 
   static bool get hasPending => _pendingPayload != null;
 
+  /// Centralized helper to navigate after successful authentication.
+  /// If there is a pending deeplink, routes the user directly to the
+  /// corresponding deep link page. Otherwise, falls back to the home page.
+  static void navigateAfterAuth(BuildContext context) {
+    final pending = consumePending();
+    debugPrint('[DeeplinkService] navigateAfterAuth called, pending: $pending');
+    if (pending != null) {
+      if (pending is DeeplinkConnectData) {
+        context.go('/connect-wallet', extra: pending);
+      } else if (pending is DeeplinkDisconnectData) {
+        context.go('/disconnect-wallet', extra: pending);
+      } else {
+        context.go('/pay', extra: pending);
+      }
+    } else {
+      context.go('/home');
+    }
+  }
+
   DeeplinkService(this._router) : _appLinks = AppLinks();
 
   Future<void> init() async {

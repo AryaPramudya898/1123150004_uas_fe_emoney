@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/services/deeplink_service.dart';
 import '../../../domain/usecases/auth/get_me_usecase.dart';
 import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -64,7 +65,7 @@ class _TwoFATotpPageState extends State<TwoFATotpPage> {
           sl<GetMeUsecase>().call().then((user) {
             authBloc.add(AuthUserUpdated(user));
           }).catchError((_) {});
-          context.go('/home');
+          DeeplinkService.navigateAfterAuth(context);
         } else if (state is OtpInvalid) {
           setState(() => _hasError = true);
           Future.delayed(const Duration(milliseconds: 650), () {

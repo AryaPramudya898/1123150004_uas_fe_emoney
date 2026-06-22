@@ -37,22 +37,8 @@ class _SplashPageState extends State<SplashPage> {
       _unlockWithBiometric();
     } else {
       if (mounted) {
-        _navigateAfterAuth();
+        DeeplinkService.navigateAfterAuth(context);
       }
-    }
-  }
-
-  /// Navigasi ke halaman deeplink yang sesuai jika ada pending deeplink, atau /home jika tidak.
-  void _navigateAfterAuth() {
-    final pending = DeeplinkService.consumePending();
-    if (pending != null) {
-      if (pending is DeeplinkConnectData) {
-        context.go('/connect-wallet', extra: pending);
-      } else {
-        context.go('/pay', extra: pending);
-      }
-    } else {
-      context.go('/home');
     }
   }
 
@@ -60,7 +46,7 @@ class _SplashPageState extends State<SplashPage> {
     final service = sl<BiometricService>();
     final success = await service.authenticate();
     if (success && mounted) {
-      _navigateAfterAuth();
+      DeeplinkService.navigateAfterAuth(context);
     }
   }
 

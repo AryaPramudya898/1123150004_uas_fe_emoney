@@ -13,7 +13,6 @@ import '../../widgets/app_logo.dart';
 import '../../widgets/feature_icon.dart';
 import '../../widgets/transaction_row.dart';
 import '../../../core/services/notification_service.dart';
-import '../../../core/services/deeplink_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,19 +31,6 @@ class _HomePageState extends State<HomePage> {
     final authBloc = context.read<AuthBloc>();
     NotificationService.registerToken(authBloc);
     NotificationService.setupForegroundListener();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final pending = DeeplinkService.consumePending();
-        if (pending != null) {
-          if (pending is DeeplinkConnectData) {
-            context.go('/connect-wallet', extra: pending);
-          } else {
-            context.go('/pay', extra: pending);
-          }
-        }
-      }
-    });
   }
 
   @override

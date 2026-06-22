@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/services/biometric_service.dart';
+import '../../../core/services/deeplink_service.dart';
 import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
@@ -32,43 +33,44 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _checkBiometricSupport();
+    _checkBiometrics();
   }
 
-  Future<void> _checkBiometricSupport() async {
-    final service = sl<BiometricService>();
-    final isAvailable = await service.isBiometricAvailable();
-    final isEnabled = await service.isBiometricEnabled();
+  Future<void> _checkBiometrics() async {
+    final bio = sl<BiometricService>();
+    final supported = await bio.isBiometricAvailable();
+    final enabled = await bio.isBiometricEnabled();
     if (mounted) {
       setState(() {
-        _isBiometricSupported = isAvailable;
-        _isBiometricEnabled = isEnabled;
+        _isBiometricSupported = supported;
+        _isBiometricEnabled = enabled;
       });
     }
   }
 
+  bool get _valid => _email.contains('@') && _pw.length >= 4;
+
   Future<void> _loginWithBiometric() async {
-    final service = sl<BiometricService>();
-    final authenticated = await service.authenticate();
-    if (authenticated) {
-      final creds = await service.getSavedCredentials();
-      if (creds != null) {
-        setState(() {
-          _email = creds['email']!;
-          _pw = creds['password']!;
-        });
-        _loginWithEmail();
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Kredensial biometrik tidak ditemukan. Silakan login manual terlebih dahulu.')),
-          );
-        }
+    final bio = sl<BiometricService>();
+    final creds = await bio.getSavedCredentials();
+    if (creds == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kredensial biometrik tidak ditemukan, silakan login manual.')),
+        );
       }
+      return;
+    }
+
+    final success = await bio.authenticate();
+    if (success && mounted) {
+      setState(() {
+        _email = creds['email']!;
+        _pw = creds['password']!;
+      });
+      _loginWithEmail();
     }
   }
-
-  bool get _valid => _email.contains('@') && _pw.length >= 4;
 
   Future<void> _loginWithGoogle() async {
     setState(() => _gLoading = true);
@@ -78,7 +80,6 @@ class _LoginPageState extends State<LoginPage> {
         await FirebaseAuth.instance.signOut();
       } catch (_) {}
       final googleSignIn = GoogleSignIn();
-      // Keluar dari sesi Google yang ter-cache agar dialog pilih akun selalu muncul
       await googleSignIn.signOut();
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
@@ -89,11 +90,7 @@ class _LoginPageState extends State<LoginPage> {
       debugPrint('[Auth] Google sign-in: akun dipilih → ${googleUser.email}');
 
       final googleAuth = await googleUser.authentication;
-      debugPrint(
-          '[Auth] Google auth: accessToken=${googleAuth.accessToken != null ? "OK" : "NULL"}, '
-          'idToken=${googleAuth.idToken != null ? "OK" : "NULL"}');
-
-      final credential = GoogleAuthProvider.credential(
+      final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
@@ -101,11 +98,8 @@ class _LoginPageState extends State<LoginPage> {
       debugPrint('[Auth] Firebase sign-in OK → uid=${userCredential.user?.uid}');
 
       final idToken = await userCredential.user?.getIdToken();
-      debugPrint(
-          '[Auth] Firebase ID token: ${idToken != null ? "OK (${idToken.length} chars)" : "NULL"}');
 
       if (idToken != null && mounted) {
-        debugPrint('[Auth] Kirim token ke backend → POST /v1/auth/verify-token');
         context.read<AuthBloc>().add(AuthLoginWithFirebase(idToken));
       }
     } catch (e, st) {
@@ -148,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
         if (state is AuthNeedsVerification) {
           context.go('/2fa/smtp');
         } else if (state is AuthAuthenticated) {
-          context.go('/home');
+          DeeplinkService.navigateAfterAuth(context);
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: AppColors.red),

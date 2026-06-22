@@ -57,16 +57,6 @@ class DompetKampusApp extends StatelessWidget {
           if (state is AuthAuthenticated) {
             final authBloc = context.read<AuthBloc>();
             NotificationService.registerToken(authBloc);
-
-            // Cek dan proses deeplink tertunda setelah sukses login/2FA
-            final pending = DeeplinkService.consumePending();
-            if (pending != null) {
-              if (pending is DeeplinkConnectData) {
-                AppRouter.router.go('/connect-wallet', extra: pending);
-              } else {
-                AppRouter.router.go('/pay', extra: pending);
-              }
-            }
           }
         },
         child: MaterialApp.router(
