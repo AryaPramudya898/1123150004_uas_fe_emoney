@@ -60,7 +60,7 @@ class DompetKampusApp extends StatelessWidget {
           }
         },
         child: MaterialApp.router(
-          title: 'Dompet Kampus Global',
+          title: 'Coach E-Money',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           routerConfig: AppRouter.router,
