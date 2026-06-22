@@ -91,10 +91,14 @@ class DeeplinkCallbackService {
 
       debugPrint('[DeeplinkCallback] Mengirim callback: $uri');
 
-      // Tidak pakai canLaunchUrl — custom scheme merchant tidak perlu
-      // dideklarasikan di <queries> AndroidManifest. Cukup coba launch
-      // dan tangkap error jika app merchant tidak terpasang.
-      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+      // Custom scheme merchant direferensikan via launchUrl.
+      // Menggunakan externalApplication karena lebih andal untuk custom schemes,
+      // dengan fallback ke platformDefault jika tidak berhasil.
+      final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!success) {
+        debugPrint('[DeeplinkCallback] launchUrl(externalApplication) gagal, mencoba mode platformDefault...');
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
       debugPrint('[DeeplinkCallback] Callback terkirim.');
     } catch (e) {
       // Callback gagal tidak boleh mengganggu alur payment
