@@ -42,11 +42,12 @@ class _SuccessPageState extends State<SuccessPage> {
         child: Column(
           children: [
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(28, 24, 28, 0),
                 child: Column(
                   children: [
-                    const Spacer(),
+                    const SizedBox(height: 24),
                     const SuccessCheck(),
                     const SizedBox(height: 24),
                     Text(widget.title,
@@ -123,7 +124,7 @@ class _SuccessPageState extends State<SuccessPage> {
                         ),
                       ),
                     ],
-                    const Spacer(),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),

@@ -36,11 +36,13 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
     if (kind == 'connect' || kind == 'disconnect') {
       context.read<OtpBloc>().add(OtpVerifyTotp(code));
     } else if (kind == 'transfer' || kind == 'payment' || kind == 'deeplink') {
+      final desc = kind == 'deeplink'
+          ? (flow['merchantName'] as String? ?? 'Merchant')
+          : (flow['note'] as String? ?? flow['description'] as String? ?? 'Transfer');
+
       context.read<PaymentBloc>().add(PaymentTransferRequested(
             amount: (flow['amount'] as num).toDouble(),
-            description: flow['note'] as String? ??
-                flow['description'] as String? ??
-                'Transfer',
+            description: desc,
             otpCode: code,
             otpType: 'totp',
           ));

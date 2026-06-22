@@ -143,7 +143,8 @@ class _PinPageState extends State<PinPage> {
                 ),
               ] else ...[
                 Expanded(
-                  child: Padding(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
                     child: Column(
                       children: [
@@ -168,7 +169,7 @@ class _PinPageState extends State<PinPage> {
                         const Text('Masukkan 6 digit PIN keamanan kamu',
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 13.5, color: AppColors.slate500)),
-                        const Spacer(),
+                        const SizedBox(height: 24),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 80),
                           transform: _hasError ? (Matrix4.identity()..translate(10.0)) : Matrix4.identity(),
