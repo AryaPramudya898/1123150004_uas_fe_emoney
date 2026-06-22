@@ -171,6 +171,12 @@ class DeeplinkService {
     return payload;
   }
 
+  /// Set pending payload secara manual (misalnya ketika user belum login).
+  static void setPending(Object? payload) {
+    _pendingPayload = payload;
+    debugPrint('[DeeplinkService] setPending: $payload');
+  }
+
   static bool get hasPending => _pendingPayload != null;
 
   DeeplinkService(this._router) : _appLinks = AppLinks();

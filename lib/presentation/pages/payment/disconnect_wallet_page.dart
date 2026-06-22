@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/services/deeplink_callback_service.dart';
 import '../../../core/services/deeplink_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_logo.dart';
 
@@ -23,6 +25,21 @@ class DisconnectWalletPage extends StatelessWidget {
           ? payload
           : 'Link pemutusan tidak ditemukan atau tidak valid.';
       return _ErrorView(message: message);
+    }
+
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      // Store payload as pending in DeeplinkService
+      DeeplinkService.setPending(payload);
+      // Redirect to login page
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/login');
+      });
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
     }
 
     return Scaffold(

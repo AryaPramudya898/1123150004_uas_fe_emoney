@@ -74,6 +74,9 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _gLoading = true);
     try {
       debugPrint('[Auth] Google sign-in: memulai...');
+      try {
+        await FirebaseAuth.instance.signOut();
+      } catch (_) {}
       final googleSignIn = GoogleSignIn();
       // Keluar dari sesi Google yang ter-cache agar dialog pilih akun selalu muncul
       await googleSignIn.signOut();

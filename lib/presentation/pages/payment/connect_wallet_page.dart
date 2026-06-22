@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/services/deeplink_callback_service.dart';
 import '../../../core/services/deeplink_service.dart';
+import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../injection/injection_container.dart';
+import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_logo.dart';
 import '../../widgets/feature_icon.dart';
@@ -21,6 +25,33 @@ class ConnectWalletPage extends StatelessWidget {
     context.go('/home');
   }
 
+  Future<void> _handleConnect(BuildContext context, DeeplinkConnectData payload) async {
+    final bioService = sl<BiometricService>();
+    final isAvailable = await bioService.isBiometricAvailable();
+    final isEnabled = await bioService.isBiometricEnabled();
+
+    final flowData = {
+      'kind': 'connect',
+      'merchantId': payload.merchantId,
+      'merchantName': payload.merchantName,
+      'callbackUrl': payload.callbackUrl,
+    };
+
+    if (isAvailable && isEnabled) {
+      final success = await bioService.authenticate();
+      if (success && context.mounted) {
+        // Biometrics succeeded: proceed directly to payment-otp
+        context.go('/payment-otp', extra: flowData);
+        return;
+      }
+    }
+
+    // Fallback if biometrics is not available, not enabled, or failed/cancelled
+    if (context.mounted) {
+      context.go('/pin', extra: flowData);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final payload = data;
@@ -30,6 +61,21 @@ class ConnectWalletPage extends StatelessWidget {
           ? payload
           : 'Link koneksi tidak ditemukan atau tidak valid.';
       return _ErrorView(message: message);
+    }
+
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      // Store payload as pending in DeeplinkService
+      DeeplinkService.setPending(payload);
+      // Redirect to login page
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/login');
+      });
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
     }
 
     return PopScope(
@@ -160,12 +206,7 @@ class ConnectWalletPage extends StatelessWidget {
                 children: [
                   AppButton(
                     label: 'Hubungkan Akun',
-                    onPressed: () => context.go('/pin', extra: {
-                      'kind': 'connect',
-                      'merchantId': payload.merchantId,
-                      'merchantName': payload.merchantName,
-                      'callbackUrl': payload.callbackUrl,
-                    }),
+                    onPressed: () => _handleConnect(context, payload),
                   ),
                   const SizedBox(height: 8),
                   TextButton(

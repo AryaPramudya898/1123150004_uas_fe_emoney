@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/error/exceptions.dart';
 import '../../core/error/failures.dart';
 import '../../domain/entities/user_entity.dart';
@@ -120,6 +121,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await _local.clearAll();
     _remote.clearAuthToken();
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
   }
 
   @override
