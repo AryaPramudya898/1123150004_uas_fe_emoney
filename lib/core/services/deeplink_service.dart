@@ -102,6 +102,45 @@ class DeeplinkConnectData {
   }
 }
 
+/// Payload yang diterima dari deeplink memutuskan wallet.
+/// Format URL yang didukung:
+///   dompetkampus://disconnect?merchant_id=...&merchant_name=...&callback=...
+@immutable
+class DeeplinkDisconnectData {
+  final String merchantId;
+  final String merchantName;
+  final String callbackUrl;
+
+  const DeeplinkDisconnectData({
+    required this.merchantId,
+    required this.merchantName,
+    required this.callbackUrl,
+  });
+
+  factory DeeplinkDisconnectData.fromUri(Uri uri) {
+    final q = uri.queryParameters;
+    final merchantId = q['merchant_id'];
+    final merchantName = q['merchant_name'];
+    final callbackUrl = q['callback'];
+
+    if (merchantId == null || merchantId.trim().isEmpty) {
+      throw const FormatException('Link pemutusan tidak valid: merchant_id tidak ditemukan.');
+    }
+    if (merchantName == null || merchantName.trim().isEmpty) {
+      throw const FormatException('Link pemutusan tidak valid: merchant_name tidak ditemukan.');
+    }
+    if (callbackUrl == null || callbackUrl.trim().isEmpty) {
+      throw const FormatException('Link pemutusan tidak valid: callback tidak ditemukan.');
+    }
+
+    return DeeplinkDisconnectData(
+      merchantId: merchantId,
+      merchantName: merchantName,
+      callbackUrl: callbackUrl,
+    );
+  }
+}
+
 /// Mendengarkan deeplink pembayaran dan mengarahkan ke halaman /pay.
 ///
 /// ## Dua skenario yang ditangani berbeda:
@@ -144,7 +183,7 @@ class DeeplinkService {
     try {
       final initialUri = await _appLinks.getInitialLink();
       debugPrint('[DeeplinkService] initialUri (cold-start): $initialUri');
-      if (initialUri != null && (_isPaymentLink(initialUri) || _isConnectLink(initialUri))) {
+      if (initialUri != null && (_isPaymentLink(initialUri) || _isConnectLink(initialUri) || _isDisconnectLink(initialUri))) {
         _storePending(initialUri);
       }
     } catch (e) {
@@ -167,6 +206,8 @@ class DeeplinkService {
         _pendingPayload = DeeplinkPaymentData.fromUri(uri);
       } else if (_isConnectLink(uri)) {
         _pendingPayload = DeeplinkConnectData.fromUri(uri);
+      } else if (_isDisconnectLink(uri)) {
+        _pendingPayload = DeeplinkDisconnectData.fromUri(uri);
       }
       debugPrint('[DeeplinkService] Pending tersimpan: $_pendingPayload');
     } on FormatException catch (e) {
@@ -208,6 +249,20 @@ class DeeplinkService {
           _router.go('/connect-wallet', extra: e.message);
         });
       }
+    } else if (_isDisconnectLink(uri)) {
+      try {
+        final data = DeeplinkDisconnectData.fromUri(uri);
+        debugPrint('[DeeplinkService] Jadwal navigasi /disconnect-wallet — ${data.merchantName}');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          debugPrint('[DeeplinkService] router.go("/disconnect-wallet") dieksekusi');
+          _router.go('/disconnect-wallet', extra: data);
+        });
+      } on FormatException catch (e) {
+        debugPrint('[DeeplinkService] Format error: ${e.message}');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _router.go('/disconnect-wallet', extra: e.message);
+        });
+      }
     } else {
       debugPrint('[DeeplinkService] Bukan payment atau connect link, diabaikan.');
     }
@@ -228,6 +283,16 @@ class DeeplinkService {
     if (uri.scheme == 'https' &&
         uri.host == 'dompetkampus.app' &&
         uri.path.startsWith('/connect')) {
+      return true;
+    }
+    return false;
+  }
+
+  bool _isDisconnectLink(Uri uri) {
+    if (uri.scheme == 'dompetkampus' && uri.host == 'disconnect') return true;
+    if (uri.scheme == 'https' &&
+        uri.host == 'dompetkampus.app' &&
+        uri.path.startsWith('/disconnect')) {
       return true;
     }
     return false;

@@ -33,6 +33,7 @@ import '../../presentation/pages/payment/payment_deeplink_page.dart';
 import '../../core/services/deeplink_service.dart';
 import '../../presentation/pages/payment/payment_otp_page.dart';
 import '../../presentation/pages/payment/connect_wallet_page.dart';
+import '../../presentation/pages/payment/disconnect_wallet_page.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -184,6 +185,10 @@ class AppRouter {
           GoRoute(
             path: '/connect-wallet',
             builder: (_, state) => ConnectWalletPage(data: state.extra),
+          ),
+          GoRoute(
+            path: '/disconnect-wallet',
+            builder: (_, state) => DisconnectWalletPage(data: state.extra),
           ),
           GoRoute(
             path: '/payment-otp',
