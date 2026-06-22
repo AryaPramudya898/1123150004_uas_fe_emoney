@@ -184,7 +184,7 @@ class AppRouter {
             path: '/payment-otp',
             builder: (_, state) {
               final extra = (state.extra as Map<String, dynamic>?) ?? {};
-              return _withPayment(PaymentOtpPage(flowData: extra));
+              return _withPaymentOtp(PaymentOtpPage(flowData: extra));
             },
           ),
         ],
