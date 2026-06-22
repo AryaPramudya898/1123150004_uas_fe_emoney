@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/deeplink_callback_service.dart';
@@ -60,6 +61,13 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
     return BlocListener<OtpBloc, OtpState>(
       listener: (context, state) {
         if (state is OtpTotpEnabled || state is OtpVerified) {
+          // Simpan status koneksi aplikasi
+          const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
+          storage.write(
+            key: 'connected_app_${flow['merchantId']}',
+            value: flow['merchantName'] as String? ?? 'Aplikasi',
+          );
+
           // Kirim callback sukses ke merchant jika ada callbackUrl
           final callbackUrl = flow['callbackUrl'] as String?;
           if (callbackUrl != null && callbackUrl.isNotEmpty) {
