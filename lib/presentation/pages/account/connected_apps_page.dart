@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +31,16 @@ class _ConnectedAppsPageState extends State<ConnectedAppsPage> {
       all.forEach((key, value) {
         if (key.startsWith('connected_app_')) {
           final id = key.substring('connected_app_'.length);
-          list.add({'id': id, 'name': value});
+          String name = value;
+          String callback = '';
+          try {
+            final parsed = jsonDecode(value) as Map<String, dynamic>;
+            name = parsed['name'] as String? ?? value;
+            callback = parsed['callback'] as String? ?? '';
+          } catch (_) {
+            // fallback if it's not JSON
+          }
+          list.add({'id': id, 'name': name, 'callback': callback});
         }
       });
       setState(() {
@@ -42,7 +52,7 @@ class _ConnectedAppsPageState extends State<ConnectedAppsPage> {
     }
   }
 
-  Future<void> _disconnect(String id, String name) async {
+  Future<void> _disconnect(String id, String name, String callback) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -58,7 +68,7 @@ class _ConnectedAppsPageState extends State<ConnectedAppsPage> {
           ),
         ),
         content: Text(
-          'Apakah Anda yakin ingin memutuskan sambungan Coach E-Money dengan aplikasi "$name"? Anda perlu menghubungkan kembali jika ingin bertransaksi dari aplikasi tersebut.',
+          'Apakah Anda yakin ingin memutuskan sambungan Coach E-Money dengan aplikasi "$name"? Tindakan ini membutuhkan verifikasi PIN dan Google Authenticator Anda.',
           style: const TextStyle(
             fontFamily: 'PlusJakartaSans',
             color: AppColors.slate500,
@@ -89,7 +99,7 @@ class _ConnectedAppsPageState extends State<ConnectedAppsPage> {
               elevation: 0,
             ),
             child: const Text(
-              'Putuskan',
+              'Lanjutkan',
               style: TextStyle(
                 fontFamily: 'PlusJakartaSans',
                 color: Colors.white,
@@ -103,41 +113,13 @@ class _ConnectedAppsPageState extends State<ConnectedAppsPage> {
     );
 
     if (confirm == true) {
-      try {
-        const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
-        await storage.delete(key: 'connected_app_$id');
-        await _loadConnectedApps();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Berhasil memutuskan sambungan dengan $name',
-                      style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: AppColors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Gagal memutuskan sambungan: $e'),
-              backgroundColor: AppColors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
+      if (mounted) {
+        context.go('/pin', extra: {
+          'kind': 'disconnect',
+          'merchantId': id,
+          'merchantName': name,
+          'callbackUrl': callback,
+        });
       }
     }
   }
@@ -266,7 +248,7 @@ class _ConnectedAppsPageState extends State<ConnectedAppsPage> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => _disconnect(app['id']!, app['name']!),
+                            onPressed: () => _disconnect(app['id']!, app['name']!, app['callback'] ?? ''),
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.red,
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -61,11 +62,39 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
     return BlocListener<OtpBloc, OtpState>(
       listener: (context, state) {
         if (state is OtpTotpEnabled || state is OtpVerified) {
-          // Simpan status koneksi aplikasi
+          final kind = flow['kind'] as String? ?? '';
+          if (kind == 'disconnect') {
+            const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
+            storage.delete(key: 'connected_app_${flow['merchantId']}');
+
+            // Kirim callback putus ke merchant jika ada callbackUrl
+            final callbackUrl = flow['callbackUrl'] as String?;
+            if (callbackUrl != null && callbackUrl.isNotEmpty) {
+              DeeplinkCallbackService.notifyDisconnect(
+                callbackUrl: callbackUrl,
+              );
+            }
+            context.go('/success', extra: {
+              'title': 'Koneksi Diputuskan',
+              'subtitle': 'Sambungan Coach E-Money dengan ${flow['merchantName']} telah diputuskan.',
+              'amount': 0.0,
+              'lines': [
+                ['Aplikasi', flow['merchantName'] as String? ?? 'Aplikasi'],
+                ['Status', 'Terputus'],
+              ],
+            });
+            return;
+          }
+
+          // Simpan status koneksi aplikasi sebagai JSON
           const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
+          final connectionData = jsonEncode({
+            'name': flow['merchantName'] as String? ?? 'Aplikasi',
+            'callback': flow['callbackUrl'] as String? ?? '',
+          });
           storage.write(
             key: 'connected_app_${flow['merchantId']}',
-            value: flow['merchantName'] as String? ?? 'Aplikasi',
+            value: connectionData,
           );
 
           // Kirim callback sukses ke merchant jika ada callbackUrl

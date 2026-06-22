@@ -50,6 +50,15 @@ class DeeplinkCallbackService {
     });
   }
 
+  /// Kirim callback terputus setelah wallet diputuskan.
+  static Future<void> notifyDisconnect({
+    required String callbackUrl,
+  }) async {
+    await _launch(callbackUrl, {
+      'status': 'disconnected',
+    });
+  }
+
   /// Kirim callback dibatalkan/ditolak saat menghubungkan wallet.
   static Future<void> notifyConnectCancelled({
     required String callbackUrl,
