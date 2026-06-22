@@ -47,6 +47,20 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
     }
   }
 
+  void _cancel() async {
+    final flow = widget.flowData;
+    final callbackUrl = flow['callbackUrl'] as String?;
+    if (callbackUrl != null && callbackUrl.isNotEmpty) {
+      await DeeplinkCallbackService.notifyCancelled(
+        callbackUrl: callbackUrl,
+        reference: flow['reference'] as String?,
+      );
+    }
+    if (mounted) {
+      context.go('/home');
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -162,6 +176,14 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
             );
           } else if (state is PaymentInsufficientBalance) {
             setState(() => _verifying = false);
+            final callbackUrl = flow['callbackUrl'] as String?;
+            if (callbackUrl != null && callbackUrl.isNotEmpty) {
+              DeeplinkCallbackService.notifyFailed(
+                callbackUrl: callbackUrl,
+                reference: flow['reference'] as String?,
+                errorMessage: 'Saldo tidak cukup',
+              );
+            }
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Saldo Anda tidak mencukupi untuk melakukan transaksi ini.'),
@@ -170,26 +192,39 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
             );
           } else if (state is PaymentError) {
             setState(() => _verifying = false);
+            final callbackUrl = flow['callbackUrl'] as String?;
+            if (callbackUrl != null && callbackUrl.isNotEmpty) {
+              DeeplinkCallbackService.notifyFailed(
+                callbackUrl: callbackUrl,
+                reference: flow['reference'] as String?,
+                errorMessage: state.message,
+              );
+            }
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
             );
           }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.bg,
-          body: SafeArea(
-            child: Column(
-              children: [
-                // Header
-                Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.fromLTRB(4, 8, 16, 8),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
-                        onPressed: () => context.go('/home'),
-                      ),
+        child: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) _cancel();
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.bg,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.fromLTRB(4, 8, 16, 8),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
+                          onPressed: _cancel,
+                        ),
                       const Text(
                         'Verifikasi Keamanan',
                         style: TextStyle(
@@ -343,6 +378,7 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

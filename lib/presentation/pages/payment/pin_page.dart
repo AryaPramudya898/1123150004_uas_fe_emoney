@@ -55,6 +55,20 @@ class _PinPageState extends State<PinPage> {
     context.go('/payment-otp', extra: widget.flowData);
   }
 
+  void _cancel() async {
+    final kind = widget.flowData['kind'] as String? ?? '';
+    final callbackUrl = widget.flowData['callbackUrl'] as String?;
+    if (kind == 'deeplink' && callbackUrl != null && callbackUrl.isNotEmpty) {
+      await DeeplinkCallbackService.notifyCancelled(
+        callbackUrl: callbackUrl,
+        reference: widget.flowData['reference'] as String?,
+      );
+    }
+    if (mounted) {
+      context.go('/home');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<PaymentBloc, PaymentState>(
@@ -93,18 +107,23 @@ class _PinPageState extends State<PinPage> {
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppColors.ink),
-                  onPressed: () => context.go('/home'),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _cancel();
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(Icons.close_rounded, color: AppColors.ink),
+                    onPressed: _cancel,
+                  ),
                 ),
-              ),
               if (_busy) ...[
                 const Expanded(
                   child: Column(
@@ -180,6 +199,7 @@ class _PinPageState extends State<PinPage> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
