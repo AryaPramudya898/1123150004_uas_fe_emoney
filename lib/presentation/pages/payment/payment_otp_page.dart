@@ -190,6 +190,9 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
                 backgroundColor: AppColors.red,
               ),
             );
+            if (context.mounted) {
+              context.go('/home');
+            }
           } else if (state is PaymentError) {
             setState(() => _verifying = false);
             final callbackUrl = flow['callbackUrl'] as String?;
@@ -203,6 +206,9 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: AppColors.red),
             );
+            if (context.mounted) {
+              context.go('/home');
+            }
           }
         },
         child: PopScope(
