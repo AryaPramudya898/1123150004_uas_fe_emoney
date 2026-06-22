@@ -10,6 +10,7 @@ import 'core/utils/app_bloc_observer.dart';
 import 'injection/injection_container.dart' as di;
 import 'presentation/blocs/auth/auth_bloc.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/deeplink_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +57,16 @@ class DompetKampusApp extends StatelessWidget {
           if (state is AuthAuthenticated) {
             final authBloc = context.read<AuthBloc>();
             NotificationService.registerToken(authBloc);
+
+            // Cek dan proses deeplink tertunda setelah sukses login/2FA
+            final pending = DeeplinkService.consumePending();
+            if (pending != null) {
+              if (pending is DeeplinkConnectData) {
+                AppRouter.router.go('/connect-wallet', extra: pending);
+              } else {
+                AppRouter.router.go('/pay', extra: pending);
+              }
+            }
           }
         },
         child: MaterialApp.router(
