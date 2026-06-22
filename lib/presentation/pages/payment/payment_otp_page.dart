@@ -33,7 +33,7 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
     final flow = widget.flowData;
     final kind = flow['kind'] as String? ?? '';
 
-    if (kind == 'connect') {
+    if (kind == 'connect' || kind == 'disconnect') {
       context.read<OtpBloc>().add(OtpVerifyTotp(code));
     } else if (kind == 'transfer' || kind == 'payment' || kind == 'deeplink') {
       context.read<PaymentBloc>().add(PaymentTransferRequested(
@@ -243,7 +243,9 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
                         Text(
                           kind == 'connect'
                               ? 'Buka Google Authenticator atau aplikasi authenticator Anda,\nlalu masukkan kode 6 digit untuk menghubungkan akun dengan ${flow['merchantName']}.'
-                              : 'Buka Google Authenticator atau aplikasi authenticator Anda,\nlalu masukkan kode 6 digit untuk transaksi ${CurrencyFormatter.format(amount)}.',
+                              : kind == 'disconnect'
+                                  ? 'Buka Google Authenticator atau aplikasi authenticator Anda,\nlalu masukkan kode 6 digit untuk memutuskan sambungan dengan ${flow['merchantName']}.'
+                                  : 'Buka Google Authenticator atau aplikasi authenticator Anda,\nlalu masukkan kode 6 digit untuk transaksi ${CurrencyFormatter.format(amount)}.',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 13.5,
