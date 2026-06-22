@@ -60,17 +60,17 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
     final amount = (flow['amount'] as num? ?? 0).toDouble();
 
     return BlocListener<OtpBloc, OtpState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is OtpTotpEnabled || state is OtpVerified) {
           final kind = flow['kind'] as String? ?? '';
           if (kind == 'disconnect') {
             const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
-            storage.delete(key: 'connected_app_${flow['merchantId']}');
+            await storage.delete(key: 'connected_app_${flow['merchantId']}');
 
             // Kirim callback putus ke merchant jika ada callbackUrl
             final callbackUrl = flow['callbackUrl'] as String?;
             if (callbackUrl != null && callbackUrl.isNotEmpty) {
-              DeeplinkCallbackService.notifyDisconnect(
+              await DeeplinkCallbackService.notifyDisconnect(
                 callbackUrl: callbackUrl,
               );
             }
@@ -92,7 +92,7 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
             'name': flow['merchantName'] as String? ?? 'Aplikasi',
             'callback': flow['callbackUrl'] as String? ?? '',
           });
-          storage.write(
+          await storage.write(
             key: 'connected_app_${flow['merchantId']}',
             value: connectionData,
           );
@@ -100,7 +100,7 @@ class _PaymentOtpPageState extends State<PaymentOtpPage> {
           // Kirim callback sukses ke merchant jika ada callbackUrl
           final callbackUrl = flow['callbackUrl'] as String?;
           if (callbackUrl != null && callbackUrl.isNotEmpty) {
-            DeeplinkCallbackService.notifyConnectSuccess(
+            await DeeplinkCallbackService.notifyConnectSuccess(
               callbackUrl: callbackUrl,
             );
           }
