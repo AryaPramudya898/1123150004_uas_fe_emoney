@@ -3,7 +3,7 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   // API
-  static const String baseUrl = 'http://192.168.8.196:8080'; // Ganti dengan hasil: hostname -I
+  static const String baseUrl = 'http://192.168.43.98:8080'; // Ganti dengan hasil: hostname -I
   static const String apiVersion = '/v1';
   static const int connectTimeout = 30;
   static const int receiveTimeout = 30;
