@@ -118,7 +118,6 @@ sequenceDiagram
     autonumber
     participant Ecom as Sepatu Ku (Merchant App)
     participant Wallet as Coach E-Money (Wallet App)
-    
     Ecom->>Ecom: Buat transaksi PENDING di Backend Sepatu Futsal
     Ecom->>Wallet: Buka via Custom URL Scheme<br/>dompetkampus://pay?merchant_id=...&amount=...&callback=sepatufutsal://checkout
     Note over Wallet: Wallet terbuka ke halaman konfirmasi pembayaran
@@ -144,3 +143,35 @@ sequenceDiagram
    Manifes aplikasi e-commerce dikonfigurasi untuk mematikan navigasi otomatis bawaan Flutter untuk deep links, sehingga tautan `sepatufutsal://checkout` dan `sepatufutsal://connect` dapat diproses secara manual dan aman oleh paket `app_links` tanpa mereset navigasi pengguna kembali ke Splash/Home.
 4. **Isolasi Dialog Global**:
    Pengecekan dialog aktif (`_isConnectDialogOpen`) pada tab Profile mencegah tab background memanggil `Navigator.pop` secara tidak sengaja yang dapat merusak tumpukan halaman checkout saat proses penghubungan e-money berhasil dilakukan.
+
+## Tampilan UI untuk aplikasi 
+
+* Tampilan 1
+<p align="center">
+  <img src="assets/images/ecommerce1.jpeg" width="200"/>
+  <img src="assets/images/ecommerce2.jpeg" width="200"/>
+  <img src="assets/images/ecommerce3.jpeg" width="200"/>
+</p>
+
+* Tampilan 2
+<p align="center">
+  <img src="assets/images/ecommerce1.jpeg" width="200"/>
+  <img src="assets/images/ecommerce2.jpeg" width="200"/>
+  <img src="assets/images/ecommerce3.jpeg" width="200"/>
+</p>
+
+## Repository & Link Presntasi Youtube
+
+### Github Repository
+
+* [E-commerce Sepatu ku](https://github.com/AryaPramudya898/uts_1123150004.git) - Klik untuk melihat repositori E-Commerce
+
+* [Coach E-Money](https://github.com/AryaPramudya898/1123150004_uas_fe_emoney.git) - Klik untuk melihat repositori E-Money Wallet
+
+* [Backend E-Commerce](https://github.com/AryaPramudya898/backend-sepatu-futsal-v2.git) - Klik untuk melihat repositori Backend Api E-commerce
+
+* [Backend E-Money](https://github.com/AryaPramudya898/1123150004_uas_be_emoney.git) - Klik untuk melihat repositori Backend Api E-Money
+
+### Presntasi Youtube
+
+* [E-commerce Sepatu ku](https://www.youtube.com/) - Klik untuk melihat video Presntasi Youtube E-Commerce
