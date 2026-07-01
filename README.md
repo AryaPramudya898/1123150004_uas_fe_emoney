@@ -146,7 +146,7 @@ sequenceDiagram
 
 ## Tampilan UI untuk aplikasi 
 
-* Tampilan 1
+* Tampilan 1 ( E-Commerce Sepatuku )
 <p align="center">
   <img width="200" alt="WhatsApp Image 2026-07-01 at 15 34 44" src="https://github.com/user-attachments/assets/22d908a5-4e0d-4888-82a8-63fb07d17c42" />
   <img width="200" alt="WhatsApp Image 2026-07-01 at 16 33 34" src="https://github.com/user-attachments/assets/d9d10009-12f8-4805-8bf9-3af2d38820bc" />
@@ -154,11 +154,11 @@ sequenceDiagram
 
 </p>
 
-* Tampilan 2
+* Tampilan 2 ( E-Money Coach-Emoney)
 <p align="center">
-  <img src="assets/images/ecommerce1.jpeg" width="200"/>
-  <img src="assets/images/ecommerce2.jpeg" width="200"/>
-  <img src="assets/images/ecommerce3.jpeg" width="200"/>
+  <img width="200" alt="WhatsApp Image 2026-07-01 at 17 04 02" src="https://github.com/user-attachments/assets/4df186ea-ae03-4b94-ac81-c40eace0ee3d" />
+<img width="200" alt="WhatsApp Image 2026-07-01 at 17 04 02 (1)" src="https://github.com/user-attachments/assets/6bb39199-731e-45f2-97f9-dbadba573873" />
+  <img width="200" alt="WhatsApp Image 2026-07-01 at 17 04 01" src="https://github.com/user-attachments/assets/dce0f020-8ff4-4dca-b4dc-60bde3f252c9" />
 </p>
 
 ## Repository & Link Presntasi Youtube
