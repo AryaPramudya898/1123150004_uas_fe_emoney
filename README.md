@@ -148,7 +148,7 @@ sequenceDiagram
 
 * Tampilan 1
 <p align="center">
-  <img width="1208" height="2644" alt="WhatsApp Image 2026-07-01 at 15 34 44" src="https://github.com/user-attachments/assets/22d908a5-4e0d-4888-82a8-63fb07d17c42" />
+  <img width="200" alt="WhatsApp Image 2026-07-01 at 15 34 44" src="https://github.com/user-attachments/assets/22d908a5-4e0d-4888-82a8-63fb07d17c42" />
   <img src="assets/images/ecommerce2.jpeg" width="200"/>
   <img src="assets/images/ecommerce3.jpeg" width="200"/>
 </p>
