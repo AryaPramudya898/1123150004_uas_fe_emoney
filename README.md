@@ -3,8 +3,8 @@
  * Nama : Arya Pramudya Akbar
  * Nim : 1123150004
  * Jurusan : Teknik Informatika
- * Kelas : TI SE P1
- * Mata Kuliah : Pemrograman Mobile Lanjutan
+ * Kelas : TI SE 23 P1
+ * Mata Kuliah : Aplikasi Mobile Lanjutan
 
 ## Arsitektur & Desain Sistem
 
